@@ -1,3 +1,5 @@
+using BackgroundServiceAPI.Models.Config;
+using BackgroundServiceAPI.Services;
 
 namespace BackgroundServiceAPI
 {
@@ -13,6 +15,16 @@ namespace BackgroundServiceAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            /*builder.Services.Configure<BackgroundServiceSettings>(
+                builder.Configuration.GetSection(nameof(BackgroundServiceSettings)));*/
+
+            builder.Services.AddOptions<BackgroundServiceSettings>()
+                .Bind(builder.Configuration.GetSection(nameof(BackgroundServiceSettings)))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services.AddTransient<IConfigService, ConfigService>();
 
             var app = builder.Build();
 
