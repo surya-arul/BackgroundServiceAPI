@@ -4,7 +4,10 @@ namespace BackgroundServiceAPI.Models.Config
 {
     public class BackgroundServiceSettings
     {
-        [Range(1, 1440)]
-        public int IntervalInMinutes { get; set; }
+        [Range(0.1, 1440)]
+        public double IntervalInMinutes { get; set; }
+
+        [Required]
+        public string FilePath { get; set; } = null!;
     }
 }
