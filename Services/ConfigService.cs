@@ -25,6 +25,7 @@ namespace BackgroundServiceAPI.Services
                 var bgServiceSettingsResponse = new GetBackgroundServiceSettingsResponse
                 {
                     IntervalInMinutes = _options.CurrentValue.IntervalInMinutes,
+                    FilePath = _options.CurrentValue.FilePath,
                 };
 
                 return bgServiceSettingsResponse;
