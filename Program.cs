@@ -19,7 +19,11 @@ namespace BackgroundServiceAPI
             // Add services to the container.
 
             // Register Background Services
+            #region Background Services
+
             builder.Services.AddHostedService<WorkerService>();
+
+            #endregion
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -29,14 +33,14 @@ namespace BackgroundServiceAPI
             #region Binding config settings
 
             builder.Services.AddOptions<BackgroundServiceSettings>()
-                    .Bind(builder.Configuration.GetSection(nameof(BackgroundServiceSettings)))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
+                .Bind(builder.Configuration.GetSection(nameof(BackgroundServiceSettings)))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             builder.Services.AddOptions<ConnectionStrings>()
                 .Bind(builder.Configuration.GetSection(nameof(ConnectionStrings)))
                 .ValidateDataAnnotations()
-            .ValidateOnStart(); 
+                .ValidateOnStart(); 
 
             #endregion
 
