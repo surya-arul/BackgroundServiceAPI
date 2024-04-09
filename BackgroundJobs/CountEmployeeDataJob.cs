@@ -1,28 +1,24 @@
-﻿using BackgroundServiceAPI.Models.Config;
-using BackgroundServiceAPI.Repositories;
-using Microsoft.Extensions.Options;
+﻿using BackgroundServiceAPI.Repositories;
 
 namespace BackgroundServiceAPI.BackgroundTasks
 {
-    public interface ICountEmployeeDataTask
+    public interface ICountEmployeeDataJob
     {
-        Task CountEmployeeDataAsync(CancellationToken stoppingToken);
+        Task CountEmployeeDataAsync(string filePath);
     }
 
-    public class CountEmployeeDataTask : ICountEmployeeDataTask
+    public class CountEmployeeDataJob : ICountEmployeeDataJob
     {
-        private readonly ILogger<CountEmployeeDataTask> _logger;
-        private readonly IOptionsMonitor<BackgroundServiceSettings> _bgSettings;
+        private readonly ILogger<CountEmployeeDataJob> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public CountEmployeeDataTask(ILogger<CountEmployeeDataTask> logger, IOptionsMonitor<BackgroundServiceSettings> bgSettings, IServiceProvider serviceProvider)
+        public CountEmployeeDataJob(ILogger<CountEmployeeDataJob> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
-            _bgSettings = bgSettings;
             _serviceProvider = serviceProvider;
         }
 
-        public async Task CountEmployeeDataAsync(CancellationToken stoppingToken)
+        public async Task CountEmployeeDataAsync(string filePath)
         {
             try
             {
@@ -35,12 +31,19 @@ namespace BackgroundServiceAPI.BackgroundTasks
                     {
                         var employeeCount = await employeeRepository.GetEmployeesCount();
 
-                        var directoryPath = Path.GetDirectoryName(_bgSettings.CurrentValue.FilePath);
+                        var directoryPath = Path.GetDirectoryName(filePath);
 
                         // Ensure the directory exists before writing the file
                         if (Directory.Exists(directoryPath))
                         {
-                            await File.WriteAllTextAsync(_bgSettings.CurrentValue.FilePath, $"Current count of employees: {employeeCount} - [{DateTime.Now}]");
+                            // To append text in file
+                            /*using (StreamWriter writer = File.AppendText(filePath))
+                            {
+                                await writer.WriteLineAsync($"Current count of employees: {employeeCount} - [{DateTime.Now}]");
+                            }*/
+
+                            // To overwrite text in file
+                            await File.WriteAllTextAsync(filePath, $"Current count of employees: {employeeCount} - [{DateTime.Now}]");
                         }
                         else
                         {
@@ -52,7 +55,6 @@ namespace BackgroundServiceAPI.BackgroundTasks
                         _logger.LogWarning("Table does not exist. Skipping file writing operation.");
                     }
                 }
-                await Task.Delay(TimeSpan.FromMinutes(_bgSettings.CurrentValue.IntervalInMinutes), stoppingToken);
             }
             catch (Exception)
             {

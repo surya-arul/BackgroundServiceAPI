@@ -1,16 +1,20 @@
 ﻿using BackgroundServiceAPI.BackgroundTasks;
+using BackgroundServiceAPI.Models.Config;
+using Microsoft.Extensions.Options;
 
 namespace BackgroundServiceAPI.BackgroundServices
 {
     public class WorkerService : BackgroundService
     {
         private readonly ILogger<WorkerService> _logger;
-        private readonly ICountEmployeeDataTask _employeeDataProcessor;
+        private readonly ICountEmployeeDataJob _countEmployeeDataJob;
+        private readonly IOptionsMonitor<BackgroundServiceSettings> _bgSettings;
 
-        public WorkerService(ILogger<WorkerService> logger, ICountEmployeeDataTask employeeDataProcessor)
+        public WorkerService(ILogger<WorkerService> logger, ICountEmployeeDataJob countEmployeeDataJob, IOptionsMonitor<BackgroundServiceSettings> bgSettings)
         {
             _logger = logger;
-            _employeeDataProcessor = employeeDataProcessor;
+            _countEmployeeDataJob = countEmployeeDataJob;
+            _bgSettings = bgSettings;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -19,7 +23,9 @@ namespace BackgroundServiceAPI.BackgroundServices
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await _employeeDataProcessor.CountEmployeeDataAsync(stoppingToken);
+                    await _countEmployeeDataJob.CountEmployeeDataAsync(_bgSettings.CurrentValue.FilePath);
+
+                    await Task.Delay(TimeSpan.FromSeconds(_bgSettings.CurrentValue.IntervalInMinutes), stoppingToken);
                 }
             }
             catch (Exception)

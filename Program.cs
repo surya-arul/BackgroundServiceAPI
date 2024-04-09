@@ -26,15 +26,19 @@ namespace BackgroundServiceAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            #region Binding config settings
+
             builder.Services.AddOptions<BackgroundServiceSettings>()
-                .Bind(builder.Configuration.GetSection(nameof(BackgroundServiceSettings)))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+                    .Bind(builder.Configuration.GetSection(nameof(BackgroundServiceSettings)))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
             builder.Services.AddOptions<ConnectionStrings>()
                 .Bind(builder.Configuration.GetSection(nameof(ConnectionStrings)))
                 .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .ValidateOnStart(); 
+
+            #endregion
 
             builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
             {
@@ -45,7 +49,7 @@ namespace BackgroundServiceAPI
             builder.Services.AddSingleton<IConfigService, ConfigService>();
             builder.Services.AddTransient<IEmployeeRepository, EmployeeRepository>();
 
-            builder.Services.AddTransient<ICountEmployeeDataTask, CountEmployeeDataTask>();
+            builder.Services.AddTransient<ICountEmployeeDataJob, CountEmployeeDataJob>();
 
             var app = builder.Build();
 
