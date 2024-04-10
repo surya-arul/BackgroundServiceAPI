@@ -25,7 +25,7 @@ namespace BackgroundServiceAPI.BackgroundServices
                 {
                     await _countEmployeeDataJob.CountEmployeeDataAsync(_bgSettings.CurrentValue.FilePath);
 
-                    await Task.Delay(TimeSpan.FromSeconds(_bgSettings.CurrentValue.IntervalInMinutes), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(_bgSettings.CurrentValue.IntervalInMinutes), stoppingToken);
                 }
             }
             catch (Exception)
